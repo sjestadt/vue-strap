@@ -19,6 +19,7 @@
         :title="attr(title)"
         :type="type=='textarea'?null:type"
         v-model="val"
+        :value="value"
         @blur="emit" @focus="emit" @input="emit"
         @keyup.enter="type!='textarea'&&enterSubmit&&submit()"
       ></textarea>
@@ -47,6 +48,7 @@
         :title="attr(title)"
         :type="type=='textarea'?null:type"
         v-model="val"
+        :value="value"
         @blur="emit" @focus="emit" @input="emit"
         @keyup.enter="type!='textarea'&&enterSubmit&&submit()"
       ></textarea>
@@ -74,7 +76,7 @@ export default {
     datalist: {type: Array, default: null},
     disabled: {type: Boolean, default: false},
     enterSubmit: {type: Boolean, default: false},
-    error: {type: String, default: null},
+    error: {type: Array, default: () => []},
     help: {type: String, default: null},
     hideHelp: {type: Boolean, default: true},
     icon: {type: Boolean, default: false},
@@ -113,7 +115,7 @@ export default {
     canValidate () { return !this.disabled && !this.readonly && (this.required || this.regex || this.nativeValidate || this.match !== null) },
     errorText () {
       let value = this.value
-      let error = [this.error]
+      let error = this.error
       if (!value && this.required) error.push('(' + this.text.required.toLowerCase() + ')')
       if (value && (value.length < this.minlength)) error.push('(' + this.text.minLength.toLowerCase() + ': ' + this.minlength + ')')
       return error.join(' ')
@@ -131,7 +133,7 @@ export default {
     input () { return this.$refs.input },
     nativeValidate () { return (this.input || {}).checkValidity && (~['url', 'email'].indexOf(this.type.toLowerCase()) || this.min || this.max) },
     regex () { return coerce.pattern(this.pattern) },
-    showError () { return this.error && this.valid === false },
+    showError () { return this.error.length && this.valid === false },
     showHelp () { return this.help && (!this.showError || !this.hideHelp) },
     text () { return translations(this.lang) },
     title () { return this.errorText || this.help || '' }
